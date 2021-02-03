@@ -496,6 +496,33 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		return this._rightPriceAxisWidget;
 	}
 
+	public getCrosshairPosition(x: Coordinate, y: Coordinate): void {
+		this._model().setAndSaveCurrentPosition(this._correctXCoord(x), this._correctYCoord(y), ensureNotNull(this._state));
+	}
+
+	public setCrossHair(xx: number, yy: number, visible: boolean): void {
+		if (!this._state) {
+			return;
+		}
+		if (visible) {
+			const x = xx as Coordinate;
+			const y = yy as Coordinate;
+
+			if (!mobileTouch) {
+				this._setCrosshairPositionNoFire(x, y);
+			}
+		} else {
+			this._state.model().setHoveredSource(null);
+			if (!isMobile) {
+				this._clearCrosshairPosition();
+			}
+		}
+	}
+
+	public clearCrossHair(): void {
+		this._clearCrosshairPosition();
+	}
+
 	private _onStateDestroyed(): void {
 		if (this._state !== null) {
 			this._state.onDestroyed().unsubscribeAll(this);
@@ -643,6 +670,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	private _clearCrosshairPosition(): void {
 		this._model().clearCurrentPosition();
+	}
+
+	private _setCrosshairPositionNoFire(x: Coordinate, y: Coordinate): void {
+		this._model().setAndSaveCurrentPositionFire(this._correctXCoord(x), this._correctYCoord(y), false, ensureNotNull(this._state));
 	}
 
 	private _tryExitTrackingMode(): void {
