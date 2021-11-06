@@ -508,14 +508,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const x = xx as Coordinate;
 			const y = yy as Coordinate;
 
-			if (!mobileTouch) {
-				this._setCrosshairPositionNoFire(x, y);
-			}
+			this._setCrosshairPositionNoFire(x, y);
 		} else {
 			this._state.model().setHoveredSource(null);
-			if (!isMobile) {
-				this._clearCrosshairPosition();
-			}
+			this._clearCrosshairPosition();
 		}
 	}
 
