@@ -4,6 +4,7 @@ import { ensureNotNull } from '../helpers/assertions';
 import { clone, merge } from '../helpers/strict-type-checks';
 
 import { BarPrice } from '../model/bar';
+import { BoxOptions } from '../model/box-options';
 import { Coordinate } from '../model/coordinate';
 import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
@@ -18,13 +19,16 @@ import {
 import { Logical, Range, TimePoint, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
+import { Box } from './box-api';
 import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
+import { checkBoxOptions, checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
+import { IBox } from './ibox';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
+import { boxOptionsDefaults } from './options/box-options-defaults';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
 import { PriceLine } from './price-line-api';
 
@@ -168,6 +172,18 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public removePriceLine(line: IPriceLine): void {
 		this._series.removePriceLine((line as PriceLine).priceLine());
+	}
+
+	public createBox(options: BoxOptions): IBox {
+		checkBoxOptions(options);
+
+		const strictOptions = merge(clone(boxOptionsDefaults), options) as BoxOptions;
+		const box = this._series.createBox(strictOptions);
+		return new Box(box);
+	}
+
+	public removeBox(box: IBox): void {
+		this._series.removeBox((box as Box).box());
 	}
 
 	public seriesType(): TSeriesType {
